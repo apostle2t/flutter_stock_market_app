@@ -5,10 +5,10 @@ import '../news/news_screen.dart';
 import '../portfolio/portfolio_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_screen.dart';
+import '../local/local_screen.dart';
 
-/// Bottom-navigation shell hosting the four primary tabs.
-///
-/// Each tab keeps its own scroll position via [IndexedStack].
+/// Bottom-navigation for the 5 main tabs.
+
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -22,6 +22,7 @@ class _MainNavigationState extends State<MainNavigation> {
   static const List<Widget> _tabs = [
     HomeScreen(),
     PortfolioScreen(),
+    LocalScreen(),
     NewsScreen(),
     ProfileScreen(),
   ];
@@ -47,6 +48,11 @@ class _MainNavigationState extends State<MainNavigation> {
               icon: Icon(Icons.pie_chart_outline_rounded),
               activeIcon: Icon(Icons.pie_chart_rounded),
               label: 'Portfolio',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.location_on_outlined),
+              activeIcon: Icon(Icons.location_on_rounded),
+              label: 'Local',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.article_outlined),

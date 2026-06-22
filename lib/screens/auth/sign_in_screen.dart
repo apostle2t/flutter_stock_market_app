@@ -4,8 +4,6 @@ import '../../theme/app_colors.dart';
 import '../home/main_navigation.dart';
 
 /// Entry screen with email/password sign-in and social options.
-///
-/// Authentication is mocked: any (or no) input simply routes into the app.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
