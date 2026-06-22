@@ -38,7 +38,7 @@ class LocalScreen extends StatelessWidget {
         Text("Netherlands"),
         SizedBox(width: 8),
         Container( 
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 3), 
+        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 4), 
         decoration: BoxDecoration( 
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
