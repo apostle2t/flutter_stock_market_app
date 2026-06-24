@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherVest - News</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container-fluid">
+
+    <div class="row vh-100">
+
+        <aside class="col-lg-2 sidebar p-0">
+
+            <div class="logo-section p-4">
+                <h3 class="fw-bold m-0">AetherVest</h3>
+            </div>
+
+            <nav class="nav flex-column px-3 mt-3">
+
+                <a href="index.html" class="nav-link">Dashboard</a>
+
+                <a href="news.html" class="nav-link active-nav">News</a>
+
+                <a href="stock.html" class="nav-link">Markets</a>
+
+                <a href="portfolio.html" class="nav-link">Portfolio</a>
+
+                <a href="premium.html" class="nav-link">Pro Upgrade</a>
+
+            </nav>
+
+        </aside>
+
+        <main class="col-lg-10 p-0">
+
+            <header class="topbar px-4 py-3">
+
+                <h2 class="m-0">Market News</h2>
+
+            </header>
+
+            <section class="dashboard-content p-4">
+
+                <div class="mb-4">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="newsSearch"
+                        placeholder="Search news..."
+                    >
+
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mb-4">
+
+                    <button class="btn btn-primary category-btn" data-category="stock market">
+                        Markets
+                    </button>
+
+                    <button class="btn btn-outline-light category-btn" data-category="technology">
+                        Technology
+                    </button>
+
+                    <button class="btn btn-outline-light category-btn" data-category="cryptocurrency">
+                        Crypto
+                    </button>
+
+                    <button class="btn btn-outline-light category-btn" data-category="economy">
+                        Economy
+                    </button>
+
+                </div>
+
+                <div class="row g-4" id="newsContainer"></div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</div>
+
+<script src="js/news.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
