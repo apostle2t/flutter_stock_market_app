@@ -17,7 +17,7 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _index = 1; // TEMP: open on Portfolio tab to verify live total
+  int _index = 0;
 
   static const List<Widget> _tabs = [
     HomeScreen(),

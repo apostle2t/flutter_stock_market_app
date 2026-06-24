@@ -8,9 +8,9 @@ import '../../services/live_price_controller.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/async_data.dart';
+import '../../widgets/live_sparkline_chart.dart';
 import '../../widgets/live_stock.dart';
 import '../../widgets/section_header.dart';
-import '../../widgets/sparkline_chart.dart';
 import '../../widgets/stock_list_tile.dart';
 import '../stock_detail/stock_detail_screen.dart';
 
@@ -208,8 +208,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           const SizedBox(height: 16),
           SizedBox(
             height: 160,
-            child: SparklineChart(
-              data: MockData.portfolioPerformance,
+            child: LiveSparklineChart(
+              initialData: MockData.portfolioPerformance,
               color: AppColors.positive,
               strokeWidth: 2.5,
               filled: true,

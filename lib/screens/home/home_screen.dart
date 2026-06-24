@@ -7,6 +7,7 @@ import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/async_data.dart';
 import '../../widgets/change_badge.dart';
+import '../../widgets/live_index.dart';
 import '../../widgets/live_stock.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/sparkline_chart.dart';
@@ -57,8 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 scrollDirection: Axis.horizontal,
                 itemCount: indices.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 14),
-                itemBuilder: (context, index) =>
-                    _MarketIndexCard(index: indices[index]),
+                itemBuilder: (context, index) => LiveIndex(
+                  initial: indices[index],
+                  builder: (context, idx) => _MarketIndexCard(index: idx),
+                ),
               ),
             ),
           ),

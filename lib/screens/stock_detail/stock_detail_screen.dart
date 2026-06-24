@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/mock_data.dart';
 import '../../models/stock.dart';
+import '../../services/live_price_controller.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/change_badge.dart';
@@ -22,7 +23,15 @@ class StockDetailScreen extends StatefulWidget {
 class _StockDetailScreenState extends State<StockDetailScreen> {
   int _selectedRange = 2; // Defaults to "1M".
 
-  Stock get stock => widget.stock;
+  /// The live-ticking version of the stock passed in (price, change and
+  /// sparkline update via [LivePriceController]).
+  Stock get stock => LivePriceController.instance.liveOf(widget.stock);
+
+  @override
+  void initState() {
+    super.initState();
+    LivePriceController.instance.register(widget.stock);
+  }
 
   void _showTradeSheet(String action) {
     final color = action == 'Buy' ? AppColors.positive : AppColors.negative;
@@ -53,9 +62,15 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          _buildQuoteHeader(),
+          ListenableBuilder(
+            listenable: LivePriceController.instance,
+            builder: (context, _) => _buildQuoteHeader(),
+          ),
           const SizedBox(height: 24),
-          _buildChartCard(),
+          ListenableBuilder(
+            listenable: LivePriceController.instance,
+            builder: (context, _) => _buildChartCard(),
+          ),
           const SizedBox(height: 20),
           _buildTradeButtons(),
           const SizedBox(height: 28),

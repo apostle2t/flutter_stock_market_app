@@ -31,4 +31,12 @@ class MarketIndex {
   final List<double> sparkline;
 
   bool get isPositive => changePercent >= 0;
+
+  /// Returns a copy with the given fields replaced.
+  MarketIndex copyWith({double? changePercent, List<double>? sparkline}) =>
+      MarketIndex(
+        name: name,
+        changePercent: changePercent ?? this.changePercent,
+        sparkline: sparkline ?? this.sparkline,
+      );
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../models/market_index.dart';
 import '../models/stock.dart';
 
 /// Drives a simulated "live ticker" effect on top of real fetched prices.
@@ -31,9 +32,14 @@ class LivePriceController extends ChangeNotifier {
   /// Pull-back strength toward the real anchor price each tick.
   static const double _reversion = 0.08;
 
+  /// Maximum per-tick move for an index's day-change %, in percentage points.
+  static const double _indexMaxMove = 0.03;
+
   final Map<String, Stock> _live = {};
   final Map<String, double> _anchorPrice = {};
   final Map<String, double> _prevClose = {};
+  final Map<String, MarketIndex> _liveIndices = {};
+  final Map<String, double> _indexAnchor = {};
   final Random _rng = Random();
   Timer? _timer;
 
@@ -53,6 +59,19 @@ class LivePriceController extends ChangeNotifier {
   /// if it has not been registered yet.
   Stock liveOf(Stock fallback) => _live[fallback.symbol] ?? fallback;
 
+  /// Seeds a market index with its real fetched values the first time it is
+  /// seen. Subsequent calls are ignored.
+  void registerIndex(MarketIndex index) {
+    if (_liveIndices.containsKey(index.name)) return;
+    _liveIndices[index.name] = index;
+    _indexAnchor[index.name] = index.changePercent;
+  }
+
+  /// The current simulated value for [fallback]'s index, or [fallback] itself
+  /// if it has not been registered yet.
+  MarketIndex liveIndexOf(MarketIndex fallback) =>
+      _liveIndices[fallback.name] ?? fallback;
+
   @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
@@ -69,7 +88,13 @@ class LivePriceController extends ChangeNotifier {
   }
 
   void _tick() {
-    if (_live.isEmpty) return;
+    if (_live.isEmpty && _liveIndices.isEmpty) return;
+    _tickStocks();
+    _tickIndices();
+    notifyListeners();
+  }
+
+  void _tickStocks() {
     for (final symbol in _live.keys.toList()) {
       final stock = _live[symbol]!;
       final anchor = _anchorPrice[symbol] ?? stock.price;
@@ -101,7 +126,33 @@ class LivePriceController extends ChangeNotifier {
         sparkline: spark,
       );
     }
-    notifyListeners();
+  }
+
+  void _tickIndices() {
+    for (final name in _liveIndices.keys.toList()) {
+      final index = _liveIndices[name]!;
+      final anchor = _indexAnchor[name] ?? index.changePercent;
+
+      // Nudge the day-change % by a small absolute amount with mean-reversion
+      // toward the real anchor value.
+      final noise = (_rng.nextDouble() - 0.5) * 2 * _indexMaxMove;
+      final pull = (anchor - index.changePercent) * _reversion;
+      final newChange = index.changePercent + noise + pull;
+
+      // Scroll the sparkline in the direction of this tick's move.
+      final spark = List<double>.from(index.sparkline);
+      if (spark.length >= 2) {
+        final last = spark.last;
+        spark
+          ..removeAt(0)
+          ..add(last * (1 + (noise + pull) / 100));
+      }
+
+      _liveIndices[name] = index.copyWith(
+        changePercent: newChange,
+        sparkline: spark,
+      );
+    }
   }
 
   @override

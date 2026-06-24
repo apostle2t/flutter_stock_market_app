@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'screens/auth/sign_in_screen.dart';
-import 'screens/home/main_navigation.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -18,7 +17,7 @@ class AetherVestApp extends StatelessWidget {
       title: 'AetherVest',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
-      home: const MainNavigation(), // TEMP: verify live portfolio total
+      home: const SignInScreen(),
     );
   }
 }
