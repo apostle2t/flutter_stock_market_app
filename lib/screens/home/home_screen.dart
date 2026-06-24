@@ -1,19 +1,36 @@
 import 'package:flutter/material.dart';
 
-import '../../data/mock_data.dart';
+import '../../data/stock_repository.dart';
 import '../../models/market_index.dart';
 import '../../models/stock.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
+import '../../widgets/async_data.dart';
 import '../../widgets/change_badge.dart';
+import '../../widgets/live_stock.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/sparkline_chart.dart';
 import '../../widgets/stock_list_tile.dart';
 import '../stock_detail/stock_detail_screen.dart';
 
 /// Dashboard tab: greeting, search, market indices and trending stocks.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final Future<List<MarketIndex>> _indicesFuture;
+  late final Future<List<Stock>> _stocksFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _indicesFuture = stockRepository.fetchIndices();
+    _stocksFuture = stockRepository.fetchStocks();
+  }
 
   void _openStock(BuildContext context, Stock stock) {
     Navigator.of(context).push(
@@ -31,38 +48,52 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           _buildSearchBar(),
           const SizedBox(height: 24),
-          SizedBox(
-            height: 118,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: MockData.marketIndices.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 14),
-              itemBuilder: (context, index) =>
-                  _MarketIndexCard(index: MockData.marketIndices[index]),
+          AsyncData<List<MarketIndex>>(
+            future: _indicesFuture,
+            loadingHeight: 118,
+            builder: (context, indices) => SizedBox(
+              height: 118,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: indices.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 14),
+                itemBuilder: (context, index) =>
+                    _MarketIndexCard(index: indices[index]),
+              ),
             ),
           ),
           const SizedBox(height: 28),
           const SectionHeader(title: 'Trending Stocks', actionLabel: 'See all'),
           const SizedBox(height: 4),
-          ...MockData.trendingStocks.map(
-            (stock) => StockListTile(
-              stock: stock,
-              onTap: () => _openStock(context, stock),
-              trailing: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    Formatters.currency(stock.price),
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+          AsyncData<List<Stock>>(
+            future: _stocksFuture,
+            builder: (context, stocks) => Column(
+              children: [
+                ...stocks.map(
+                  (stock) => LiveStock(
+                    initial: stock,
+                    builder: (context, s) => StockListTile(
+                      stock: s,
+                      onTap: () => _openStock(context, s),
+                      trailing: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            Formatters.currency(s.price),
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          ChangeBadge(changePercent: s.changePercent),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  ChangeBadge(changePercent: stock.changePercent),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],

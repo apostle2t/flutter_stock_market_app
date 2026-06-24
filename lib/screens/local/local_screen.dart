@@ -1,20 +1,38 @@
 
 import 'package:flutter/material.dart';
 
-import '../../data/mock_data.dart';
+import '../../data/stock_repository.dart';
 import '../../models/news_article.dart';
 import '../../models/stock.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
+import '../../widgets/async_data.dart';
 import '../../widgets/change_badge.dart';
+import '../../widgets/live_stock.dart';
 import '../../widgets/news_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/sparkline_chart.dart';
 import '../../widgets/stock_list_tile.dart';
 import '../stock_detail/stock_detail_screen.dart';
 
-class LocalScreen extends StatelessWidget {
+class LocalScreen extends StatefulWidget {
   const LocalScreen({super.key});
+
+  @override
+  State<LocalScreen> createState() => _LocalScreenState();
+}
+
+class _LocalScreenState extends State<LocalScreen> {
+  // Fetched once; reused by every section so we don't hit the API twice.
+  late final Future<List<Stock>> _stocksFuture;
+  late final Future<List<NewsArticle>> _newsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _stocksFuture = stockRepository.fetchStocks();
+    _newsFuture = stockRepository.fetchNews();
+  }
 
   void _openStock(BuildContext context, Stock stock) {
     Navigator.of(context).push(
@@ -170,7 +188,6 @@ class LocalScreen extends StatelessWidget {
 // Trending in Region section. It should be a list which is rendered
 // as a horizontal list of cards.
   Widget _trendingInRegion (BuildContext context){
-    final stocks = MockData.trendingStocks;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -179,15 +196,22 @@ class LocalScreen extends StatelessWidget {
           actionLabel: 'See all',
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 168,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: stocks.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 14),
-            itemBuilder: (context, index) => _RegionCard(
-              stock: stocks[index],
-              onTap: () => _openStock(context, stocks[index]),
+        AsyncData<List<Stock>>(
+          future: _stocksFuture,
+          loadingHeight: 168,
+          builder: (context, stocks) => SizedBox(
+            height: 168,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: stocks.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 14),
+              itemBuilder: (context, index) => LiveStock(
+                initial: stocks[index],
+                builder: (context, s) => _RegionCard(
+                  stock: s,
+                  onTap: () => _openStock(context, s),
+                ),
+              ),
             ),
           ),
         ),
@@ -198,57 +222,67 @@ class LocalScreen extends StatelessWidget {
   // A dedicated stocks section for the local market.
   // It should be a list which is rendered as horizontal cards in column.
   Widget _localStocks(BuildContext context){
-    final stocks = MockData.trendingStocks;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'Stocks'),
         const SizedBox(height: 4),
-        ...stocks.map(
-          (stock) => Container(
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: StockListTile(
-              stock: stock,
-              onTap: () => _openStock(context, stock),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 64,
-                    height: 36,
-                    child: SparklineChart(
-                      data: stock.sparkline,
-                      color: AppColors.forChange(stock.changePercent),
+        AsyncData<List<Stock>>(
+          future: _stocksFuture,
+          builder: (context, stocks) => Column(
+            children: [
+              ...stocks.map(
+                (stock) => LiveStock(
+                  initial: stock,
+                  builder: (context, s) => Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: StockListTile(
+                      stock: s,
+                      onTap: () => _openStock(context, s),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 64,
+                            height: 36,
+                            child: SparklineChart(
+                              data: s.sparkline,
+                              color: AppColors.forChange(s.changePercent),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                Formatters.currency(s.price),
+                                style: const TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              ChangeBadge(
+                                changePercent: s.changePercent,
+                                showArrow: true,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        Formatters.currency(stock.price),
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      ChangeBadge(
-                        changePercent: stock.changePercent,
-                        showArrow: true,
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ],
@@ -258,17 +292,23 @@ class LocalScreen extends StatelessWidget {
   // Trending news section.
   // It should be a list which is rendered as horizontal cards in column.
   Widget _trendingNews(){
-    final List<NewsArticle> articles = MockData.news;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'Trending news'),
         const SizedBox(height: 4),
-        ...articles.map(
-          (article) => Column(
+        AsyncData<List<NewsArticle>>(
+          future: _newsFuture,
+          builder: (context, articles) => Column(
             children: [
-              NewsCard(article: article),
-              const Divider(height: 1),
+              ...articles.map(
+                (article) => Column(
+                  children: [
+                    NewsCard(article: article),
+                    const Divider(height: 1),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
