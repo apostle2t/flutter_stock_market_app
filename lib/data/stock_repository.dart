@@ -4,8 +4,10 @@ import '../config.dart';
 import '../models/holding.dart';
 import '../models/market_index.dart';
 import '../models/news_article.dart';
+import '../models/search_result.dart';
 import '../models/stock.dart';
 import '../theme/app_colors.dart';
+import '../services/finnhub_client.dart';
 import '../services/fmp_client.dart';
 import 'mock_data.dart';
 
@@ -17,9 +19,12 @@ import 'mock_data.dart';
 /// are fetched one symbol at a time and cached per symbol for the lifetime of
 /// the app session to stay within the daily request budget.
 class StockRepository {
-  StockRepository({FmpClient? client}) : _client = client ?? FmpClient();
+  StockRepository({FmpClient? client, FinnhubClient? newsClient})
+      : _client = client ?? FmpClient(),
+        _newsClient = newsClient ?? FinnhubClient();
 
   final FmpClient _client;
+  final FinnhubClient _newsClient;
 
   /// Per-symbol fetch cache (deduplicates the same ticker across screens and
   /// across concurrent calls). Cleared by [refresh].
@@ -82,33 +87,71 @@ class StockRepository {
     }
   }
 
-  /// Recent market news for [symbols].
+  /// Recent general market news (from Finnhub — FMP's news is paid-only),
+  /// capped at [limit] items.
   ///
-  /// The news endpoint is paid-only on the free tier; on failure this returns
-  /// bundled headlines so the feed is never empty.
-  Future<List<NewsArticle>> fetchNews([List<String>? symbols]) async {
-    if (!_live) return MockData.news;
-    final syms = symbols ?? defaultSymbols;
+  /// Only articles with a real photo are kept (Finnhub's generic source-logo
+  /// placeholders are skipped) so every card shows an image. Falls back to
+  /// bundled headlines when no Finnhub key is set or on failure, so the feed is
+  /// never empty.
+  Future<List<NewsArticle>> fetchNews({int limit = 7}) async {
+    if (!ApiConfig.useLiveData || !_newsClient.hasKey) {
+      return MockData.news.take(limit).toList();
+    }
     try {
-      final rows = await _client.getList(
-        'news/stock',
-        query: {'symbols': syms.join(','), 'limit': '20'},
-      );
+      final rows =
+          await _newsClient.getList('news', query: {'category': 'general'});
       final articles = <NewsArticle>[];
-      for (var i = 0; i < rows.length; i++) {
-        final row = rows[i];
-        if (row is Map<String, dynamic>) {
-          articles.add(NewsArticle.fromJson(
-            row,
-            accentColor: _newsAccents[i % _newsAccents.length],
-          ));
-        }
+      for (final row in rows.whereType<Map<String, dynamic>>()) {
+        if ((row['headline'] ?? '').toString().isEmpty) continue;
+        final article = NewsArticle.fromFinnhub(
+          row,
+          accentColor: _newsAccents[articles.length % _newsAccents.length],
+        );
+        if (article.imageUrl == null) continue; // keep only real photos
+        articles.add(article);
+        if (articles.length >= limit) break;
       }
-      return articles.isEmpty ? MockData.news : articles;
+      return articles.isEmpty ? MockData.news.take(limit).toList() : articles;
     } catch (e) {
       debugPrint('fetchNews failed, using mock data: $e');
-      return MockData.news;
+      return MockData.news.take(limit).toList();
     }
+  }
+
+  /// Searches symbols/company names matching [query].
+  ///
+  /// Falls back to filtering the bundled stocks when offline or on error.
+  Future<List<SearchResult>> searchSymbols(String query) async {
+    final q = query.trim();
+    if (q.isEmpty) return const [];
+    if (!_live) return _mockSearch(q);
+    try {
+      final rows = await _client.getList(
+        'search-symbol',
+        query: {'query': q, 'limit': '25'},
+      );
+      final results = rows
+          .whereType<Map<String, dynamic>>()
+          .map(SearchResult.fromJson)
+          .where((r) => r.symbol.isNotEmpty)
+          .toList();
+      return results.isEmpty ? _mockSearch(q) : results;
+    } catch (e) {
+      debugPrint('searchSymbols failed, using mock data: $e');
+      return _mockSearch(q);
+    }
+  }
+
+  List<SearchResult> _mockSearch(String query) {
+    final lower = query.toLowerCase();
+    return MockData.trendingStocks
+        .where((s) =>
+            s.symbol.toLowerCase().contains(lower) ||
+            s.name.toLowerCase().contains(lower))
+        .map((s) =>
+            SearchResult(symbol: s.symbol, name: s.name, exchange: ''))
+        .toList();
   }
 
   /// The user's holdings with each position's stock quote refreshed live.

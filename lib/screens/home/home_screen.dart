@@ -12,6 +12,7 @@ import '../../widgets/live_stock.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/sparkline_chart.dart';
 import '../../widgets/stock_list_tile.dart';
+import '../search/search_screen.dart';
 import '../stock_detail/stock_detail_screen.dart';
 
 /// Dashboard tab: greeting, search, market indices and trending stocks.
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildHeader(),
           const SizedBox(height: 20),
-          _buildSearchBar(),
+          _buildSearchBar(context),
           const SizedBox(height: 24),
           AsyncData<List<MarketIndex>>(
             future: _indicesFuture,
@@ -139,12 +140,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return TextField(
-      style: const TextStyle(color: AppColors.textPrimary),
-      decoration: const InputDecoration(
-        hintText: 'Search stocks, companies...',
-        prefixIcon: Icon(Icons.search_rounded, color: AppColors.textTertiary),
+  Widget _buildSearchBar(BuildContext context) {
+    // The field is display-only here; tapping it opens the dedicated search
+    // screen where the actual typing/querying happens.
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const SearchScreen()),
+      ),
+      child: AbsorbPointer(
+        child: TextField(
+          style: const TextStyle(color: AppColors.textPrimary),
+          decoration: const InputDecoration(
+            hintText: 'Search stocks, companies...',
+            prefixIcon:
+                Icon(Icons.search_rounded, color: AppColors.textTertiary),
+          ),
+        ),
       ),
     );
   }

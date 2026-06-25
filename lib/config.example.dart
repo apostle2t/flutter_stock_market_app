@@ -7,8 +7,12 @@
 ///   cp lib/config.example.dart lib/config.dart
 ///
 abstract final class ApiConfig {
-  /// Your Financial Modeling Prep API key.
+  /// Your Financial Modeling Prep API key (quotes, search, indices).
   static const String fmpApiKey = 'YOUR_FMP_API_KEY_HERE';
+
+  /// Your Finnhub API key (market news — FMP's news endpoint is paid-only).
+  /// Get a free key at https://finnhub.io/register
+  static const String finnhubApiKey = 'YOUR_FINNHUB_API_KEY_HERE';
 
   /// When false (or the key is missing) the app serves bundled [MockData]
   /// instead of hitting the network — handy for offline development/demos.

@@ -44,6 +44,9 @@ dependencies:
   # HTTP client for the Financial Modeling Prep API.
   http: ^1.2.2
 
+  # Opening news article links in the browser.
+  url_launcher: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -63,7 +63,7 @@ class _LocalScreenState extends State<LocalScreen> {
   }
 
 
-  /** Things we need to build */
+  /// Things we need to build
 
 
 // A header with the location title and a statemenet (Top gaineers)

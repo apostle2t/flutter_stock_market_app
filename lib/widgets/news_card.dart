@@ -1,26 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/news_article.dart';
 import '../theme/app_colors.dart';
 
-/// A news headline row with a coloured placeholder thumbnail.
+/// A news headline row with a thumbnail. Tapping opens the article link in an
+/// in-app browser (unless an explicit [onTap] override is supplied).
 class NewsCard extends StatelessWidget {
   const NewsCard({super.key, required this.article, this.onTap});
 
   final NewsArticle article;
   final VoidCallback? onTap;
 
+  Future<void> _openArticle(BuildContext context) async {
+    final link = article.url;
+    final uri = link == null ? null : Uri.tryParse(link);
+    if (uri == null) return;
+    final ok = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text("Couldn't open the article")),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Use the explicit override if given; otherwise open the article link when
+    // one exists (tap is disabled for link-less mock articles).
+    final effectiveOnTap = onTap ??
+        (article.url == null ? null : () => _openArticle(context));
     return InkWell(
-      onTap: onTap,
+      onTap: effectiveOnTap,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Thumbnail(color: article.accentColor),
+            _Thumbnail(color: article.accentColor, imageUrl: article.imageUrl),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -85,17 +105,36 @@ class NewsCard extends StatelessWidget {
 }
 
 class _Thumbnail extends StatelessWidget {
-  const _Thumbnail({required this.color});
+  const _Thumbnail({required this.color, this.imageUrl});
 
   final Color color;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 72,
-      height: 72,
+    final placeholder = _placeholder();
+    final url = imageUrl;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: SizedBox(
+        width: 72,
+        height: 72,
+        child: url == null
+            ? placeholder
+            : Image.network(
+                url,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, progress) =>
+                    progress == null ? child : placeholder,
+                errorBuilder: (context, error, stackTrace) => placeholder,
+              ),
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
