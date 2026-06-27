@@ -7,9 +7,40 @@ import '../models/news_article.dart';
 import '../models/search_result.dart';
 import '../models/stock.dart';
 import '../theme/app_colors.dart';
+import '../utils/formatters.dart';
 import '../services/finnhub_client.dart';
 import '../services/fmp_client.dart';
+import '../services/yahoo_client.dart';
 import 'mock_data.dart';
+import 'region_markets.dart';
+
+/// Real "Key Information" stats for the detail screen. Fields are null when a
+/// value isn't available from the free data sources (so the UI can hide them
+/// rather than show blanks).
+class KeyStats {
+  const KeyStats({
+    this.marketCap,
+    this.peRatio,
+    this.volume,
+    this.high52,
+    this.low52,
+  });
+
+  final String? marketCap;
+  final String? peRatio;
+  final String? volume;
+  final String? high52;
+  final String? low52;
+
+  /// Display-ready (label, value) rows, omitting any missing field.
+  List<(String, String)> get rows => [
+        if (marketCap != null) ('Market Cap', marketCap!),
+        if (peRatio != null) ('P/E Ratio', peRatio!),
+        if (volume != null) ('Volume', volume!),
+        if (high52 != null) ('52W High', high52!),
+        if (low52 != null) ('52W Low', low52!),
+      ];
+}
 
 /// High-level data source for the app. Talks to [FmpClient] when a key is
 /// configured and live data is enabled, and transparently falls back to
@@ -19,12 +50,17 @@ import 'mock_data.dart';
 /// are fetched one symbol at a time and cached per symbol for the lifetime of
 /// the app session to stay within the daily request budget.
 class StockRepository {
-  StockRepository({FmpClient? client, FinnhubClient? newsClient})
-      : _client = client ?? FmpClient(),
-        _newsClient = newsClient ?? FinnhubClient();
+  StockRepository({
+    FmpClient? client,
+    FinnhubClient? newsClient,
+    YahooClient? regionClient,
+  })  : _client = client ?? FmpClient(),
+        _newsClient = newsClient ?? FinnhubClient(),
+        _regionClient = regionClient ?? YahooClient();
 
   final FmpClient _client;
   final FinnhubClient _newsClient;
+  final YahooClient _regionClient;
 
   /// Per-symbol fetch cache (deduplicates the same ticker across screens and
   /// across concurrent calls). Cleared by [refresh].
@@ -86,6 +122,83 @@ class StockRepository {
       return _mockStock(symbol);
     }
   }
+
+  /// Live quotes + sparklines for a region's watchlist, fetched from Yahoo
+  /// (which — unlike FMP's free tier — covers global symbols). Each entry's
+  /// display [RegionStock.symbol]/[RegionStock.name] are kept; only the price
+  /// data comes from the network. Falls back to the bundled US stocks if every
+  /// lookup fails.
+  Future<List<Stock>> fetchRegionStocks(List<RegionStock> entries) async {
+    final results = await Future.wait(entries.map((entry) async {
+      final quote = await _regionClient.fetchQuote(entry.yahooSymbol);
+      if (quote == null) return null;
+      return Stock(
+        symbol: entry.symbol,
+        name: entry.name,
+        price: quote.price,
+        changePercent: quote.changePercent,
+        sparkline: quote.sparkline,
+        yahooSymbol: entry.yahooSymbol,
+      );
+    }));
+    final stocks = results.whereType<Stock>().toList();
+    return stocks.isEmpty ? _mockStocks(defaultSymbols) : stocks;
+  }
+
+  /// Real key statistics for the detail screen.
+  ///
+  /// Region stocks (those with a [Stock.yahooSymbol]) use Yahoo's chart meta
+  /// (volume + 52-week range; market cap / P/E aren't freely available there).
+  /// US-style tickers use Finnhub's metrics (P/E + market cap + 52-week range)
+  /// plus the volume already on the quote.
+  Future<KeyStats> fetchKeyStats(Stock stock) async {
+    if (stock.yahooSymbol != null) {
+      final meta = await _regionClient.fetchMeta(stock.chartSymbol);
+      if (meta == null) return const KeyStats();
+      return KeyStats(
+        volume: meta.volume == null ? null : Formatters.compact(meta.volume!),
+        high52:
+            meta.high52 == null ? null : Formatters.money(meta.high52!, meta.currency),
+        low52:
+            meta.low52 == null ? null : Formatters.money(meta.low52!, meta.currency),
+      );
+    }
+
+    final json = await _newsClient.getJson(
+      'stock/metric',
+      query: {'symbol': stock.symbol, 'metric': 'all'},
+    );
+    final metric = json?['metric'];
+    String? pe, marketCap, high52, low52;
+    if (metric is Map<String, dynamic>) {
+      final peVal = (metric['peTTM'] as num?)?.toDouble();
+      pe = peVal?.toStringAsFixed(1);
+      // Finnhub reports market cap in millions.
+      final mc = (metric['marketCapitalization'] as num?)?.toDouble();
+      marketCap = mc == null ? null : Formatters.compactCurrency(mc * 1e6);
+      final h = (metric['52WeekHigh'] as num?)?.toDouble();
+      final l = (metric['52WeekLow'] as num?)?.toDouble();
+      high52 = h == null ? null : Formatters.currency(h);
+      low52 = l == null ? null : Formatters.currency(l);
+    }
+    String? orNull(String s) => s.isEmpty ? null : s;
+    return KeyStats(
+      marketCap: marketCap ?? orNull(stock.marketCap),
+      peRatio: pe,
+      volume: orNull(stock.volume),
+      high52: high52 ?? orNull(stock.high52Week),
+      low52: low52 ?? orNull(stock.low52Week),
+    );
+  }
+
+  /// Historical close series for [yahooSymbol] over a Yahoo [range]/[interval],
+  /// used by the detail chart's time-frame switcher.
+  Future<List<double>> fetchChartHistory(
+    String yahooSymbol, {
+    required String range,
+    required String interval,
+  }) =>
+      _regionClient.fetchHistory(yahooSymbol, range: range, interval: interval);
 
   /// Recent general market news (from Finnhub — FMP's news is paid-only),
   /// capped at [limit] items.

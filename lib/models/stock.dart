@@ -17,6 +17,7 @@ class Stock {
     this.volume = '',
     this.high52Week = '',
     this.low52Week = '',
+    this.yahooSymbol,
   });
 
   /// Builds a [Stock] from a Financial Modeling Prep `/quote` element.
@@ -68,6 +69,7 @@ class Stock {
         volume: volume,
         high52Week: high52Week,
         low52Week: low52Week,
+        yahooSymbol: yahooSymbol,
       );
 
   static double _toDouble(Object? value) {
@@ -85,6 +87,13 @@ class Stock {
 
   /// Normalised price points used to render the mini/large line charts.
   final List<double> sparkline;
+
+  /// Yahoo symbol used to fetch historical chart data (e.g. `SAP.DE`). Null for
+  /// US tickers, where [symbol] already works on Yahoo.
+  final String? yahooSymbol;
+
+  /// The symbol to query Yahoo's chart endpoint with.
+  String get chartSymbol => yahooSymbol ?? symbol;
 
   // Key information (display-ready strings).
   final String marketCap;

@@ -30,6 +30,24 @@ abstract final class Formatters {
   /// Abbreviated number without a currency symbol: `52M`, `1.2K`.
   static String compact(num value) => _compact(value);
 
+  /// Formats [value] with the symbol for [currencyCode] (e.g. `€317.40`),
+  /// falling back to a bare number for unknown currencies.
+  static String money(double value, String? currencyCode) {
+    const symbols = {
+      'USD': r'$',
+      'EUR': '€',
+      'GBP': '£',
+      'JPY': '¥',
+      'CAD': r'C$',
+      'AUD': r'A$',
+      'INR': '₹',
+      'CHF': 'CHF ',
+    };
+    final symbol = symbols[currencyCode] ?? '';
+    final digits = currencyCode == 'JPY' ? 0 : 2;
+    return '$symbol${value.toStringAsFixed(digits)}';
+  }
+
   static String _compact(num value) {
     final abs = value.abs();
     if (abs >= 1e12) return '${(value / 1e12).toStringAsFixed(1)}T';

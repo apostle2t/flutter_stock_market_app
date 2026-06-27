@@ -1,9 +1,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/region_markets.dart';
 import '../../data/stock_repository.dart';
 import '../../models/news_article.dart';
 import '../../models/stock.dart';
+import '../../services/location_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/async_data.dart';
@@ -24,13 +26,19 @@ class LocalScreen extends StatefulWidget {
 
 class _LocalScreenState extends State<LocalScreen> {
   // Fetched once; reused by every section so we don't hit the API twice.
+  late final Future<LocationResult?> _locationFuture;
   late final Future<List<Stock>> _stocksFuture;
   late final Future<List<NewsArticle>> _newsFuture;
 
   @override
   void initState() {
     super.initState();
-    _stocksFuture = stockRepository.fetchStocks();
+    _locationFuture = LocationService().getCurrentLocation();
+    // The region watchlist depends on the detected location, so chain it.
+    _stocksFuture = _locationFuture.then(
+      (location) =>
+          stockRepository.fetchRegionStocks(regionFor(location?.countryCode).stocks),
+    );
     _newsFuture = stockRepository.fetchNews();
   }
 
@@ -88,52 +96,107 @@ class _LocalScreenState extends State<LocalScreen> {
         ),
       ),
       const SizedBox(height: 8),
-      // we need a row for the location icon and title
-      Row(children: [
-        const Icon(Icons.location_on, color: AppColors.primary, size: 28),
-        const SizedBox(width: 8),
-        const Text(
-          "New York",
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(width: 10),
-        // a subtle outlined pill marking the market's country
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: const Text(
-            "US",
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ]),
-      const SizedBox(height: 12),
-      // we need a row widget for the market status
-      Row(children: [
-        const Icon(Icons.circle, color: AppColors.positive, size: 10),
-        const SizedBox(width: 10),
-        Text(
-          "NYSE  ·  NASDAQ  ·  Market open",
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ]),
+      // The location title + status come from the device's real location
+      // (resolved to an area name), falling back to a default while loading or
+      // if location is unavailable.
+      FutureBuilder<LocationResult?>(
+        future: _locationFuture,
+        builder: (context, snapshot) {
+          final loading =
+              snapshot.connectionState == ConnectionState.waiting;
+          final location = snapshot.data;
+
+          final city = (location != null && location.city.isNotEmpty)
+              ? location.city
+              : 'New York';
+          final countryCode =
+              (location != null && location.countryCode.isNotEmpty)
+                  ? location.countryCode
+                  : 'US';
+          final status = _statusLine(location);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // we need a row for the location icon and title
+              Row(children: [
+                const Icon(Icons.location_on,
+                    color: AppColors.primary, size: 28),
+                const SizedBox(width: 8),
+                Text(
+                  loading ? 'Locating…' : city,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // a subtle outlined pill marking the market's country
+                if (!loading)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Text(
+                      countryCode,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+              ]),
+              const SizedBox(height: 12),
+              // we need a row widget for the market status
+              Row(children: [
+                const Icon(Icons.circle, color: AppColors.positive, size: 10),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    status,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ]),
+            ],
+          );
+        },
+      ),
       ],
     );
+  }
+
+  /// A status line describing the detected market area, with a US/default
+  /// fallback that matches the original design.
+  String _statusLine(LocationResult? location) {
+    // Show the exchanges for the detected region (e.g. XETRA · Frankfurt).
+    return '${regionFor(location?.countryCode).exchangeLabel}  ·  Market open';
+  }
+
+  /// A live summary of how the region is trading, based on the fetched stocks:
+  /// the overall trend plus the day's leading mover.
+  String _insightMessage(List<Stock>? stocks) {
+    if (stocks == null || stocks.isEmpty) {
+      return 'Tracking your local market…';
+    }
+    final leader =
+        stocks.reduce((a, b) => b.changePercent > a.changePercent ? b : a);
+    final avg = stocks.map((s) => s.changePercent).reduce((a, b) => a + b) /
+        stocks.length;
+    final trend = avg >= 0 ? 'higher' : 'lower';
+    return 'Your region is trading $trend today — ${leader.symbol} '
+        'leads at ${Formatters.signedPercent(leader.changePercent)}.';
   }
 
   // A glowing insight banner summarising how the region is trading today.
@@ -169,14 +232,17 @@ class _LocalScreenState extends State<LocalScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
-            child: Text(
-              'Your region is trading higher today — NVDA leads at +4.21%.',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 14,
-                height: 1.35,
-                fontWeight: FontWeight.w500,
+          Expanded(
+            child: FutureBuilder<List<Stock>>(
+              future: _stocksFuture,
+              builder: (context, snapshot) => Text(
+                _insightMessage(snapshot.data),
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 14,
+                  height: 1.35,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
