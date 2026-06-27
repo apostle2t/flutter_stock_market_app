@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 28),
-          const SectionHeader(title: 'Trending Stocks', actionLabel: 'See all'),
+          SectionHeader(title: 'Trending Stocks', actionLabel: 'See all'),
           const SizedBox(height: 4),
           AsyncData<List<Stock>>(
             future: _stocksFuture,
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text(
                             Formatters.currency(s.price),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: IconButton(
             onPressed: () {},
-            icon: const Icon(
+            icon: Icon(
               Icons.notifications_none_rounded,
               color: AppColors.textPrimary,
             ),
@@ -149,8 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: AbsorbPointer(
         child: TextField(
-          style: const TextStyle(color: AppColors.textPrimary),
-          decoration: const InputDecoration(
+          style: TextStyle(color: AppColors.textPrimary),
+          decoration: InputDecoration(
             hintText: 'Search stocks, companies...',
             prefixIcon:
                 Icon(Icons.search_rounded, color: AppColors.textTertiary),
@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _MarketIndexCard extends StatelessWidget {
-  const _MarketIndexCard({required this.index});
+  _MarketIndexCard({required this.index});
 
   final MarketIndex index;
 
@@ -181,7 +181,7 @@ class _MarketIndexCard extends StatelessWidget {
         children: [
           Text(
             index.name,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textSecondary,
               fontSize: 13,
               fontWeight: FontWeight.w600,

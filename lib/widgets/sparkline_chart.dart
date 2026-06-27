@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// When [filled] is true a soft gradient is painted under the line — used for
 /// the larger performance charts.
 class SparklineChart extends StatelessWidget {
-  const SparklineChart({
+  SparklineChart({
     super.key,
     required this.data,
     required this.color,

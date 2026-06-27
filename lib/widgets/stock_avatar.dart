@@ -11,13 +11,13 @@ import '../theme/app_colors.dart';
 /// tile, with a deterministic brand colour per symbol so every avatar looks
 /// intentional rather than blank.
 class StockAvatar extends StatelessWidget {
-  const StockAvatar({super.key, required this.symbol, this.size = 44});
+  StockAvatar({super.key, required this.symbol, this.size = 44});
 
   final String symbol;
   final double size;
 
   /// Palette for the initial tiles; chosen per-symbol so it's stable.
-  static const List<Color> _palette = [
+  static final List<Color> _palette = [
     AppColors.primary,
     AppColors.accent,
     Color(0xFF2E9E8F), // teal

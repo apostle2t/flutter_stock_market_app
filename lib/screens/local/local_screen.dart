@@ -86,7 +86,7 @@ class _LocalScreenState extends State<LocalScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
       // small overline label sitting above the location title
-      const Text(
+      Text(
         'LOCAL',
         style: TextStyle(
           color: AppColors.textTertiary,
@@ -120,12 +120,12 @@ class _LocalScreenState extends State<LocalScreen> {
             children: [
               // we need a row for the location icon and title
               Row(children: [
-                const Icon(Icons.location_on,
+                Icon(Icons.location_on,
                     color: AppColors.primary, size: 28),
                 const SizedBox(width: 8),
                 Text(
                   loading ? 'Locating…' : city,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
@@ -143,7 +143,7 @@ class _LocalScreenState extends State<LocalScreen> {
                     ),
                     child: Text(
                       countryCode,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -154,14 +154,14 @@ class _LocalScreenState extends State<LocalScreen> {
               const SizedBox(height: 12),
               // we need a row widget for the market status
               Row(children: [
-                const Icon(Icons.circle, color: AppColors.positive, size: 10),
+                Icon(Icons.circle, color: AppColors.positive, size: 10),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     status,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -221,7 +221,7 @@ class _LocalScreenState extends State<LocalScreen> {
           Container(
             width: 36,
             height: 36,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: AppColors.primaryGradient,
             ),
@@ -237,7 +237,7 @@ class _LocalScreenState extends State<LocalScreen> {
               future: _stocksFuture,
               builder: (context, snapshot) => Text(
                 _insightMessage(snapshot.data),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 14,
                   height: 1.35,
@@ -257,7 +257,7 @@ class _LocalScreenState extends State<LocalScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(
+        SectionHeader(
           title: 'Trending in your region',
           actionLabel: 'See all',
         ),
@@ -291,7 +291,7 @@ class _LocalScreenState extends State<LocalScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(title: 'Stocks'),
+        SectionHeader(title: 'Stocks'),
         const SizedBox(height: 4),
         AsyncData<List<Stock>>(
           future: _stocksFuture,
@@ -329,7 +329,7 @@ class _LocalScreenState extends State<LocalScreen> {
                             children: [
                               Text(
                                 Formatters.currency(s.price),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.textPrimary,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
@@ -361,7 +361,7 @@ class _LocalScreenState extends State<LocalScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader(title: 'Trending news'),
+        SectionHeader(title: 'Trending news'),
         const SizedBox(height: 4),
         AsyncData<List<NewsArticle>>(
           future: _newsFuture,
@@ -386,7 +386,7 @@ class _LocalScreenState extends State<LocalScreen> {
 /// A compact card used in the "Trending in your region" horizontal carousel:
 /// symbol + change on top, company name, a mini sparkline and the price.
 class _RegionCard extends StatelessWidget {
-  const _RegionCard({required this.stock, this.onTap});
+  _RegionCard({required this.stock, this.onTap});
 
   final Stock stock;
   final VoidCallback? onTap;
@@ -412,7 +412,7 @@ class _RegionCard extends StatelessWidget {
               children: [
                 Text(
                   stock.symbol,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -427,7 +427,7 @@ class _RegionCard extends StatelessWidget {
               stock.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
               ),
@@ -437,7 +437,7 @@ class _RegionCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               Formatters.currency(stock.price),
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,

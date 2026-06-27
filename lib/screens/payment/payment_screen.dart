@@ -27,7 +27,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.surface,
-        icon: const Icon(
+        icon: Icon(
           Icons.check_circle_rounded,
           color: AppColors.positive,
           size: 48,
@@ -36,7 +36,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         content: Text(
           'Welcome to AetherPro! Your ${widget.plan.name} is now active.',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           SizedBox(
@@ -88,7 +88,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Payment Method',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -130,7 +130,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         TextField(
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: const InputDecoration(hintText: '1234 5678 9101 1121'),
         ),
         const SizedBox(height: 16),
@@ -142,7 +142,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 children: [
                   _label('Expiry Date'),
                   TextField(
-                    style: const TextStyle(color: AppColors.textPrimary),
+                    style: TextStyle(color: AppColors.textPrimary),
                     decoration: const InputDecoration(hintText: 'MM/YY'),
                   ),
                 ],
@@ -158,7 +158,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     keyboardType: TextInputType.number,
                     obscureText: true,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    style: const TextStyle(color: AppColors.textPrimary),
+                    style: TextStyle(color: AppColors.textPrimary),
                     decoration: const InputDecoration(hintText: '123'),
                   ),
                 ],
@@ -170,7 +170,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         _label('Cardholder Name'),
         TextField(
           textCapitalization: TextCapitalization.words,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: const InputDecoration(hintText: 'John Doe'),
         ),
       ],
@@ -185,7 +185,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
-      child: const Row(
+      child: Row(
         children: [
           Icon(Icons.info_outline_rounded, color: AppColors.textSecondary),
           SizedBox(width: 12),
@@ -211,7 +211,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
       child: Column(
         children: [
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text(
               'Order Summary',
@@ -243,7 +243,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.lock_rounded, color: AppColors.textTertiary, size: 16),
+        Icon(Icons.lock_rounded, color: AppColors.textTertiary, size: 16),
         const SizedBox(width: 8),
         Text(
           'Your payment information is encrypted and secure',
@@ -258,7 +258,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       padding: const EdgeInsets.only(bottom: 8, top: 4),
       child: Text(
         text,
-        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
       ),
     );
   }
@@ -277,7 +277,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 }
 
 class _MethodChip extends StatelessWidget {
-  const _MethodChip({
+  _MethodChip({
     required this.label,
     required this.icon,
     required this.selected,

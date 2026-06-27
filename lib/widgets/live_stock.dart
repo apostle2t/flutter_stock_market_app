@@ -10,7 +10,7 @@ import '../services/live_price_controller.dart';
 /// update, rather than the whole screen. The first [initial] seen for a symbol
 /// seeds the simulation's anchor (its real fetched price).
 class LiveStock extends StatefulWidget {
-  const LiveStock({super.key, required this.initial, required this.builder});
+  LiveStock({super.key, required this.initial, required this.builder});
 
   final Stock initial;
   final Widget Function(BuildContext context, Stock stock) builder;

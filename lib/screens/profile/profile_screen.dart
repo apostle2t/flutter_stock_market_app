@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
+import '../../theme/theme_controller.dart';
 import '../auth/sign_in_screen.dart';
 import '../pro/pro_screen.dart';
 
@@ -21,7 +22,7 @@ class ProfileScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
-          const Text(
+          Text(
             'Profile',
             style: TextStyle(
               color: AppColors.textPrimary,
@@ -32,6 +33,11 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 20),
           _buildUserCard(),
           const SizedBox(height: 28),
+          _SettingsGroup(
+            title: 'Appearance',
+            children: [_DarkModeRow()],
+          ),
+          const SizedBox(height: 20),
           _SettingsGroup(
             title: 'Notifications',
             children: [
@@ -95,14 +101,14 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 24),
           OutlinedButton.icon(
             onPressed: () => _signOut(context),
-            icon: const Icon(Icons.logout_rounded, color: AppColors.negative),
-            label: const Text(
+            icon: Icon(Icons.logout_rounded, color: AppColors.negative),
+            label: Text(
               'Log out',
               style: TextStyle(color: AppColors.negative),
             ),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(54),
-              side: const BorderSide(color: AppColors.border),
+              side: BorderSide(color: AppColors.border),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -126,7 +132,7 @@ class ProfileScreen extends StatelessWidget {
           Container(
             width: 56,
             height: 56,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: AppColors.primaryGradient,
               shape: BoxShape.circle,
             ),
@@ -141,21 +147,25 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Sofia Vergara',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
                   'sofia.vergara@email.com',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13,
@@ -164,11 +174,14 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 12),
           OutlinedButton(
             onPressed: () {},
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
+              side: BorderSide(color: AppColors.primary),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              visualDensity: VisualDensity.compact,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -182,7 +195,7 @@ class ProfileScreen extends StatelessWidget {
 }
 
 class _SettingsGroup extends StatelessWidget {
-  const _SettingsGroup({required this.title, required this.children});
+  _SettingsGroup({required this.title, required this.children});
 
   final String title;
   final List<Widget> children;
@@ -196,7 +209,7 @@ class _SettingsGroup extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 10),
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textTertiary,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -226,7 +239,7 @@ class _SettingsGroup extends StatelessWidget {
 }
 
 class _NavRow extends StatelessWidget {
-  const _NavRow({
+  _NavRow({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -260,7 +273,7 @@ class _NavRow extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textTertiary,
             ),
@@ -272,7 +285,7 @@ class _NavRow extends StatelessWidget {
 }
 
 class _ToggleRow extends StatefulWidget {
-  const _ToggleRow({required this.icon, required this.label});
+  _ToggleRow({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -295,7 +308,7 @@ class _ToggleRowState extends State<_ToggleRow> {
           Expanded(
             child: Text(
               widget.label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -307,6 +320,46 @@ class _ToggleRowState extends State<_ToggleRow> {
             activeThumbColor: Colors.white,
             activeTrackColor: AppColors.primary,
             onChanged: (v) => setState(() => _value = v),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Light/dark toggle bound to [ThemeController]. Flipping it re-themes the
+/// whole app (the root listens to the controller and rebuilds).
+class _DarkModeRow extends StatelessWidget {
+  _DarkModeRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = ThemeController.instance.isDark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          Icon(
+            isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+            color: AppColors.textSecondary,
+            size: 22,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              'Dark Mode',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Switch(
+            value: isDark,
+            activeThumbColor: Colors.white,
+            activeTrackColor: AppColors.primary,
+            onChanged: (v) => ThemeController.instance.setDark(v),
           ),
         ],
       ),

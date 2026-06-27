@@ -6,7 +6,7 @@ import '../services/live_price_controller.dart';
 /// Rebuilds [builder] with a live-ticking copy of [initial] on every tick of
 /// [LivePriceController]. The index-card analogue of `LiveStock`.
 class LiveIndex extends StatefulWidget {
-  const LiveIndex({super.key, required this.initial, required this.builder});
+  LiveIndex({super.key, required this.initial, required this.builder});
 
   final MarketIndex initial;
   final Widget Function(BuildContext context, MarketIndex index) builder;

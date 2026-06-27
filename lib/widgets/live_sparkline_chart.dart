@@ -12,7 +12,7 @@ import 'sparkline_chart.dart';
 /// (e.g. the Portfolio Performance card). [drift] applies a gentle directional
 /// bias each tick — a small positive value reads as an upward trend.
 class LiveSparklineChart extends StatefulWidget {
-  const LiveSparklineChart({
+  LiveSparklineChart({
     super.key,
     required this.initialData,
     required this.color,

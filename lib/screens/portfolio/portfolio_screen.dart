@@ -39,7 +39,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
-          const Text(
+          Text(
             'Portfolio',
             style: TextStyle(
               color: AppColors.textPrimary,
@@ -61,7 +61,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 const SizedBox(height: 24),
                 _buildPerformanceCard(),
                 const SizedBox(height: 24),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: SectionHeader(title: 'Your Holdings'),
                 ),
@@ -83,7 +83,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           children: [
                             Text(
                               Formatters.currency(liveValue),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textPrimary,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -147,14 +147,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Total Portfolio Value',
             style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Text(
             Formatters.currency(total),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 34,
               fontWeight: FontWeight.w700,
@@ -197,7 +197,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Portfolio Performance',
             style: TextStyle(
               color: AppColors.textSecondary,

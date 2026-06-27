@@ -5,7 +5,7 @@ import '../utils/formatters.dart';
 
 /// Coloured percentage-change label, optionally with a trend arrow.
 class ChangeBadge extends StatelessWidget {
-  const ChangeBadge({
+  ChangeBadge({
     super.key,
     required this.changePercent,
     this.showArrow = false,

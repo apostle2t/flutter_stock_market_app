@@ -102,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
           autofocus: true,
           textInputAction: TextInputAction.search,
           onChanged: _onChanged,
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+          style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'Search stocks, companies...',
             filled: false,
@@ -112,7 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
             suffixIcon: _controller.text.isEmpty
                 ? null
                 : IconButton(
-                    icon: const Icon(Icons.close_rounded,
+                    icon: Icon(Icons.close_rounded,
                         color: AppColors.textTertiary),
                     onPressed: () {
                       _controller.clear();
@@ -126,7 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
         children: [
           _buildBody(),
           if (_opening)
-            const ColoredBox(
+            ColoredBox(
               color: Colors.black45,
               child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
@@ -139,7 +139,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
@@ -172,7 +172,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   Text(
                     result.symbol,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -183,7 +183,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     result.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
                     ),
@@ -194,7 +194,7 @@ class _SearchScreenState extends State<SearchScreen> {
             if (result.exchange.isNotEmpty)
               Text(
                 result.exchange,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.textTertiary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -213,7 +213,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Text(
           message,
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.textTertiary, fontSize: 14),
+          style: TextStyle(color: AppColors.textTertiary, fontSize: 14),
         ),
       ),
     );

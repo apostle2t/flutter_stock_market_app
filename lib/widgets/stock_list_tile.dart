@@ -7,7 +7,7 @@ import 'stock_avatar.dart';
 /// A row showing a stock's identity on the left and caller-provided [trailing]
 /// content on the right. Used for trending lists and portfolio holdings.
 class StockListTile extends StatelessWidget {
-  const StockListTile({
+  StockListTile({
     super.key,
     required this.stock,
     required this.trailing,
@@ -35,7 +35,7 @@ class StockListTile extends StatelessWidget {
                 children: [
                   Text(
                     stock.symbol,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -44,7 +44,7 @@ class StockListTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     stock.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
                     ),

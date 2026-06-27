@@ -54,7 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {},
-                  child: const Text(
+                  child: Text(
                     'Forgot password?',
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
@@ -107,7 +107,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'AetherVest',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -117,7 +117,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Track markets. Invest smarter.',
           textAlign: TextAlign.center,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
@@ -135,7 +135,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: const TextStyle(color: AppColors.textPrimary),
+      style: TextStyle(color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: Icon(icon, color: AppColors.textTertiary),
@@ -147,10 +147,10 @@ class _SignInScreenState extends State<SignInScreen> {
     return TextField(
       controller: _passwordController,
       obscureText: _obscurePassword,
-      style: const TextStyle(color: AppColors.textPrimary),
+      style: TextStyle(color: AppColors.textPrimary),
       decoration: InputDecoration(
         hintText: 'Password',
-        prefixIcon: const Icon(
+        prefixIcon: Icon(
           Icons.lock_outline_rounded,
           color: AppColors.textTertiary,
         ),
@@ -171,7 +171,7 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget _buildDivider() {
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.border)),
+        Expanded(child: Divider(color: AppColors.border)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -179,7 +179,7 @@ class _SignInScreenState extends State<SignInScreen> {
             style: TextStyle(color: AppColors.textTertiary, fontSize: 13),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.border)),
+        Expanded(child: Divider(color: AppColors.border)),
       ],
     );
   }
@@ -188,13 +188,13 @@ class _SignInScreenState extends State<SignInScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           "Don't have an account? ",
           style: TextStyle(color: AppColors.textSecondary),
         ),
         GestureDetector(
           onTap: _continue,
-          child: const Text(
+          child: Text(
             'Sign up',
             style: TextStyle(
               color: AppColors.primary,
@@ -208,7 +208,7 @@ class _SignInScreenState extends State<SignInScreen> {
 }
 
 class _SocialButton extends StatelessWidget {
-  const _SocialButton({
+  _SocialButton({
     required this.label,
     required this.icon,
     required this.background,

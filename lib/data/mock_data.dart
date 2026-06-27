@@ -135,7 +135,7 @@ abstract final class MockData {
     ),
   ];
 
-  static const List<NewsArticle> news = [
+  static final List<NewsArticle> news = [
     NewsArticle(
       title: 'Tesla stock volatility rises amid market uncertainty',
       summary:
@@ -184,7 +184,7 @@ abstract final class MockData {
   ];
 
   /// News shown in the "Related News" section of a stock detail page.
-  static const List<NewsArticle> relatedNews = [
+  static final List<NewsArticle> relatedNews = [
     NewsArticle(
       title: 'Apple shares rise after strong quarterly earnings',
       summary:

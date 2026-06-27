@@ -117,7 +117,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
           const SizedBox(height: 28),
           _buildKeyInformation(),
           const SizedBox(height: 28),
-          const Text(
+          Text(
             'Related News',
             style: TextStyle(
               color: AppColors.textPrimary,
@@ -138,7 +138,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
       children: [
         Text(
           stock.symbol,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -148,7 +148,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
         const SizedBox(height: 6),
         Text(
           Formatters.currency(stock.price),
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 34,
             fontWeight: FontWeight.w700,
@@ -163,7 +163,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
               fontSize: 14,
             ),
             const SizedBox(width: 6),
-            const Text(
+            Text(
               'Today',
               style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
             ),
@@ -184,7 +184,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Price Performance',
             style: TextStyle(
               color: AppColors.textSecondary,
@@ -196,7 +196,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
           SizedBox(
             height: 160,
             child: _chartLoading
-                ? const Center(
+                ? Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   )
                 : SparklineChart(
@@ -284,7 +284,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 16, bottom: 8),
             child: Text(
               'Key Information',
@@ -299,7 +299,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
             future: _keyStatsFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
+                return Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: Center(
                     child: SizedBox(
@@ -315,7 +315,7 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
               }
               final rows = snapshot.data?.rows ?? const [];
               if (rows.isEmpty) {
-                return const Padding(
+                return Padding(
                   padding: EdgeInsets.symmetric(vertical: 20),
                   child: Text(
                     'No additional information available.',
@@ -334,14 +334,14 @@ class _StockDetailScreenState extends State<StockDetailScreen> {
                         children: [
                           Text(
                             rows[i].$1,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                             ),
                           ),
                           Text(
                             rows[i].$2,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

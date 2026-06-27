@@ -73,14 +73,14 @@ class _ProScreenState extends State<ProScreen> {
             color: AppColors.gold.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(18),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.workspace_premium_rounded,
             color: AppColors.gold,
             size: 34,
           ),
         ),
         const SizedBox(height: 18),
-        const Text(
+        Text(
           'Upgrade to AetherPro',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -89,7 +89,7 @@ class _ProScreenState extends State<ProScreen> {
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Unlock advanced trading features',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
         ),
@@ -101,7 +101,7 @@ class _ProScreenState extends State<ProScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "What's included",
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -118,7 +118,7 @@ class _ProScreenState extends State<ProScreen> {
                 Container(
                   width: 24,
                   height: 24,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.positive,
                     shape: BoxShape.circle,
                   ),
@@ -131,7 +131,7 @@ class _ProScreenState extends State<ProScreen> {
                 const SizedBox(width: 14),
                 Text(
                   feature,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 15,
                   ),
@@ -146,7 +146,7 @@ class _ProScreenState extends State<ProScreen> {
 }
 
 class _PlanCard extends StatelessWidget {
-  const _PlanCard({
+  _PlanCard({
     required this.plan,
     required this.selected,
     required this.onTap,
@@ -191,7 +191,7 @@ class _PlanCard extends StatelessWidget {
                     children: [
                       Text(
                         plan.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -206,7 +206,7 @@ class _PlanCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     plan.billingNote,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
                     ),
@@ -218,7 +218,7 @@ class _PlanCard extends StatelessWidget {
                     children: [
                       Text(
                         Formatters.currency(plan.price),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
                           fontSize: 26,
                           fontWeight: FontWeight.w700,
@@ -226,7 +226,7 @@ class _PlanCard extends StatelessWidget {
                       ),
                       Text(
                         ' /${plan.period}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14,
                         ),
@@ -250,7 +250,7 @@ class _PlanCard extends StatelessWidget {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({required this.label});
+  _Badge({required this.label});
 
   final String label;
 

@@ -83,7 +83,7 @@ class StockRepository {
   };
 
   /// Palette cycled through news cards (the API carries no brand colour).
-  static const List<Color> _newsAccents = [
+  static final List<Color> _newsAccents = [
     AppColors.primary,
     AppColors.accent,
     AppColors.positive,

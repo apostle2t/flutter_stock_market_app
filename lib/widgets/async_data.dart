@@ -8,7 +8,7 @@ import '../theme/app_colors.dart';
 /// The repository already falls back to mock data on failure, so [errorBuilder]
 /// is rarely hit — it exists as a last resort for unexpected exceptions.
 class AsyncData<T> extends StatelessWidget {
-  const AsyncData({
+  AsyncData({
     super.key,
     required this.future,
     required this.builder,
@@ -27,7 +27,7 @@ class AsyncData<T> extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SizedBox(
             height: loadingHeight,
-            child: const Center(
+            child: Center(
               child: SizedBox(
                 width: 22,
                 height: 22,
@@ -42,7 +42,7 @@ class AsyncData<T> extends StatelessWidget {
         if (snapshot.hasError || !snapshot.hasData) {
           return SizedBox(
             height: loadingHeight,
-            child: const Center(
+            child: Center(
               child: Text(
                 "Couldn't load data",
                 style: TextStyle(color: AppColors.textTertiary),

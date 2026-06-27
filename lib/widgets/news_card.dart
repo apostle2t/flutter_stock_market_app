@@ -7,7 +7,7 @@ import '../theme/app_colors.dart';
 /// A news headline row with a thumbnail. Tapping opens the article link in an
 /// in-app browser (unless an explicit [onTap] override is supplied).
 class NewsCard extends StatelessWidget {
-  const NewsCard({super.key, required this.article, this.onTap});
+  NewsCard({super.key, required this.article, this.onTap});
 
   final NewsArticle article;
   final VoidCallback? onTap;
@@ -50,7 +50,7 @@ class NewsCard extends StatelessWidget {
                     article.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -62,7 +62,7 @@ class NewsCard extends StatelessWidget {
                     article.summary,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 13,
                       height: 1.35,
@@ -73,21 +73,21 @@ class NewsCard extends StatelessWidget {
                     children: [
                       Text(
                         article.source,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textTertiary,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         '•',
                         style: TextStyle(color: AppColors.textTertiary),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         article.timeAgo,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.textTertiary,
                           fontSize: 12,
                         ),
@@ -105,7 +105,7 @@ class NewsCard extends StatelessWidget {
 }
 
 class _Thumbnail extends StatelessWidget {
-  const _Thumbnail({required this.color, this.imageUrl});
+  _Thumbnail({required this.color, this.imageUrl});
 
   final Color color;
   final String? imageUrl;

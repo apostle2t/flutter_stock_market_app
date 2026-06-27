@@ -4,7 +4,7 @@ import '../theme/app_colors.dart';
 
 /// A section title with an optional trailing action (e.g. "See all").
 class SectionHeader extends StatelessWidget {
-  const SectionHeader({
+  SectionHeader({
     super.key,
     required this.title,
     this.actionLabel,
@@ -22,7 +22,7 @@ class SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -33,7 +33,7 @@ class SectionHeader extends StatelessWidget {
             onTap: onActionTap,
             child: Text(
               actionLabel!,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.primary,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
