@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/theme.js"></script>
+    <title>AetherVest - Payment</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="icon" type="image/jpeg" href="images/logo.jpeg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row vh-100">
+
+        <!-- SIDEBAR -->
+        <aside class="col-lg-2 sidebar p-0">
+
+            <div class="logo-section p-4">
+                <img src="images/logo.jpeg" alt="AetherVest" class="sidebar-logo">
+            </div>
+
+            <nav class="nav flex-column px-3 mt-3">
+
+                <a href="index.html" class="nav-link">🏠 Dashboard</a>
+                <a href="news.html" class="nav-link">📰 News</a>
+                <a href="stock.html" class="nav-link">📈 Markets</a>
+                <a href="portfolio.html" class="nav-link">💼 Portfolio</a>
+                <a href="profile.html" class="nav-link">👤 Profile</a>
+
+            </nav>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="col-lg-10 p-0">
+
+            <section class="dashboard-content p-4">
+
+                <div class="mb-4 d-flex align-items-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="premium.html" class="text-decoration-none fs-4" style="color:var(--aether-text-primary);">&larr;</a>
+                        <h1 class="fw-bold m-0">Upgrade to AetherPro</h1>
+                    </div>
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle theme"></button>
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- LEFT: Plan + Payment form -->
+                    <div class="col-lg-7">
+
+                        <h6 class="section-eyebrow mb-3">Choose your plan</h6>
+
+                        <div class="d-flex flex-column gap-3 mb-4">
+
+                            <div class="plan-option" id="planMonthly" data-price="9.99" data-label="Monthly Plan">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <strong>Monthly Plan</strong>
+                                            <span class="plan-badge">Most flexible</span>
+                                        </div>
+                                        <p class="m-0">Billed monthly</p>
+                                    </div>
+                                    <h4 class="m-0">€9.99<span class="fs-6"> /month</span></h4>
+                                </div>
+                            </div>
+
+                            <div class="plan-option plan-selected" id="planAnnual" data-price="99.99" data-label="Annual Plan">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <strong>Annual Plan</strong>
+                                            <span class="plan-badge">Save 20%</span>
+                                        </div>
+                                        <p class="m-0">Then just €8.34/month</p>
+                                    </div>
+                                    <h4 class="m-0">€99.99<span class="fs-6"> /year</span></h4>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h6 class="section-eyebrow mb-3">Payment Method</h6>
+
+                        <div class="payment-method-toggle mb-4">
+                            <div class="payment-method-btn method-selected" id="methodCard">
+                                💳 Card
+                            </div>
+                            <div class="payment-method-btn" id="methodPaypal">
+                                PayPal
+                            </div>
+                        </div>
+
+                        <form id="paymentForm">
+
+                            <div id="paymentAlert" class="alert d-none mb-3" role="alert"></div>
+
+                            <div id="cardFields">
+
+                                <div class="mb-3">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" name="cardNumber" id="cardNumber" placeholder="1234 5678 9101 1121" maxlength="19">
+                                    <div class="form-text text-danger d-none" id="cardNumberError"></div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" name="expiry" id="expiry" placeholder="MM/YY" maxlength="5">
+                                        <div class="form-text text-danger d-none" id="expiryError"></div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-control" name="cvv" id="cvv" placeholder="123" maxlength="4">
+                                        <div class="form-text text-danger d-none" id="cvvError"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-control" name="cardName" id="cardName" placeholder="John Doe">
+                                    <div class="form-text text-danger d-none" id="cardNameError"></div>
+                                </div>
+
+                            </div>
+
+                            <div id="paypalFields" class="d-none mb-4">
+                                <p class="text-secondary">You'll be redirected to PayPal to complete payment in the full version of this app.</p>
+                            </div>
+
+                            <!-- Order summary -->
+                            <div class="market-card mb-4">
+
+                                <h6 class="fw-bold mb-3">Order Summary</h6>
+
+                                <div class="order-summary-row">
+                                    <span id="summaryPlanLabel">AetherPro (yearly)</span>
+                                    <span id="summaryPlanPrice">€99.99</span>
+                                </div>
+
+                                <div class="order-summary-row">
+                                    <span>Tax</span>
+                                    <span id="summaryTax">€1.00</span>
+                                </div>
+
+                                <div class="order-summary-total">
+                                    <span>Total</span>
+                                    <span id="summaryTotal">€100.99</span>
+                                </div>
+
+                            </div>
+
+                            <p class="text-secondary text-center mb-3">
+                                🔒 Your payment information is encrypted and secure
+                            </p>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2">
+                                ✓ Confirm Payment
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    <!-- RIGHT: What's included (mirrors app's plan screen) -->
+                    <div class="col-lg-5">
+
+                        <div class="market-card">
+
+                            <h6 class="fw-bold mb-3">What's included</h6>
+
+                            <ul class="list-unstyled m-0 d-flex flex-column gap-2">
+                                <li>✓ Real-time stock alerts</li>
+                                <li>✓ AI-powered predictions</li>
+                                <li>✓ Advanced analytics dashboard</li>
+                                <li>✓ Ad-free experience</li>
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal" tabindex="-1" id="successModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content market-card text-center p-4">
+
+            <div class="success-icon-circle">✓</div>
+
+            <h4 class="fw-bold mb-2">Payment Successful</h4>
+
+            <p class="text-secondary mb-4">
+                Welcome to AetherPro! Your <span id="successPlanLabel">Annual</span> Plan is now active.
+            </p>
+
+            <button type="button" class="btn btn-primary" id="doneBtn">Done</button>
+
+        </div>
+    </div>
+</div>
+
+<script src="js/payment.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
