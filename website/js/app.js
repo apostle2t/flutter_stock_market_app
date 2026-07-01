@@ -1,5 +1,4 @@
 const currentDate = document.getElementById("currentDate");
-const MARKETSTACK_KEY = "c8a4104f9d2ebb0c1b775e0a8bbbe293";
 const NEWS_API_KEY = "efcaeb0b8ef24f599f32b5668ae58716";
 
 if (currentDate) {
@@ -15,39 +14,85 @@ if (currentDate) {
 }
 
 
-// Chart.js
+// Chart.js — Dashboard's main chart uses AAPL's real historical
+// closes as a representative market-trend proxy (FMP's free tier
+// doesn't expose a direct S&P 500 index quote), honestly labeled
+// as such rather than pretending to be the literal S&P 500 index.
 
-const chartCanvas = document.getElementById("marketChart");
+let dashboardChartInstance = null;
+let dashboardHistory = [];
+let dashboardRange = "1D";
 
-if (chartCanvas) {
+async function loadDashboardChart() {
 
-    const ctx = chartCanvas.getContext("2d");
+    const chartCanvas = document.getElementById("marketChart");
 
-    new Chart(ctx, {
+    if (!chartCanvas) return;
+
+    try {
+
+        dashboardHistory = await fetchHistoryCached("AAPL");
+        setupDashboardRangeButtons();
+        renderDashboardChartForRange();
+
+    } catch (error) {
+
+        console.error("Dashboard chart failed to load", error);
+
+    }
+
+}
+
+function setupDashboardRangeButtons() {
+
+    const buttons = document.querySelectorAll(".range-btn");
+
+    buttons.forEach(btn => {
+
+        btn.addEventListener("click", () => {
+
+            buttons.forEach(b => {
+                b.classList.remove("active", "btn-primary");
+                b.classList.add("btn-outline-light");
+            });
+
+            btn.classList.add("active", "btn-primary");
+            btn.classList.remove("btn-outline-light");
+
+            dashboardRange = btn.dataset.range;
+            renderDashboardChartForRange();
+
+        });
+
+    });
+
+}
+
+function renderDashboardChartForRange() {
+
+    if (!dashboardHistory.length) return;
+
+    const sliced = sliceHistoryRange(dashboardHistory, dashboardRange);
+
+    const labels = sliced.map(point => point.date);
+    const prices = sliced.map(point => point.close);
+
+    const chartCanvas = document.getElementById("marketChart");
+
+    if (dashboardChartInstance) {
+        dashboardChartInstance.data.labels = labels;
+        dashboardChartInstance.data.datasets[0].data = prices;
+        dashboardChartInstance.update();
+        return;
+    }
+
+    dashboardChartInstance = new Chart(chartCanvas, {
         type: "line",
         data: {
-            labels: [
-                "09:00",
-                "10:00",
-                "11:00",
-                "12:00",
-                "13:00",
-                "14:00",
-                "15:00",
-                "16:00"
-            ],
+            labels: labels,
             datasets: [{
-                label: "S&P 500",
-                data: [
-                    4650,
-                    4680,
-                    4670,
-                    4700,
-                    4720,
-                    4710,
-                    4750,
-                    4780
-                ],
+                label: "AAPL (market trend proxy)",
+                data: prices,
                 borderColor: "#4D8DFF",
                 backgroundColor: "rgba(77,141,255,0.2)",
                 fill: true,
@@ -60,14 +105,14 @@ if (chartCanvas) {
             plugins: {
                 legend: {
                     labels: {
-                        color: "#ffffff"
+                        color: getChartTextColor()
                     }
                 }
             },
             scales: {
                 x: {
                     ticks: {
-                        color: "#A0AEC0"
+                        color: getChartTextColor()
                     },
                     grid: {
                         color: "rgba(255,255,255,0.05)"
@@ -75,7 +120,7 @@ if (chartCanvas) {
                 },
                 y: {
                     ticks: {
-                        color: "#A0AEC0"
+                        color: getChartTextColor()
                     },
                     grid: {
                         color: "rgba(255,255,255,0.05)"
@@ -84,7 +129,11 @@ if (chartCanvas) {
             }
         }
     });
+
 }
+
+const DASHBOARD_SYMBOLS = ["AAPL", "TSLA", "NVDA", "MSFT"];
+
 async function loadMarketOverview() {
 
     const container = document.getElementById("marketOverview");
@@ -101,60 +150,67 @@ async function loadMarketOverview() {
 
     try {
 
-        const symbols = [
-            "AAPL",
-            "TSLA",
-            "NVDA",
-            "MSFT"
-        ];
+        const quotes = await fetchQuoteCached(DASHBOARD_SYMBOLS.join(","));
 
         container.innerHTML = "";
 
-        for (const symbol of symbols) {
+        for (const symbol of DASHBOARD_SYMBOLS) {
 
-            const response = await fetch(
-                `https://api.marketstack.com/v1/eod/latest?access_key=${MARKETSTACK_KEY}&symbols=${symbol}`
-            );
-
-            const data = await response.json();
-
-            const stock = data.data?.[0];
+            const stock = quotes.find(q => q.symbol === symbol);
 
             if (!stock) continue;
 
-            const change =
-                ((stock.close - stock.open) / stock.open * 100)
-                .toFixed(2);
-
-            const positive = change >= 0;
+            const positive = stock.changePercentage >= 0;
 
             container.innerHTML += `
                 <div class="col-md-6 col-xl-3">
 
-                    <div class="market-card">
+                    <a
+                        href="stock.html?symbol=${symbol}"
+                        class="market-card text-decoration-none d-block"
+                    >
 
-                        <h6>${symbol}</h6>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            ${stockIconHtml(symbol, 32)}
+                            <h6 class="m-0">${symbol}</h6>
+                        </div>
 
                         <h3
+                            id="dashPrice-${symbol}"
                             class="stock-price"
-                            data-usd="${stock.close}"
+                            data-usd="${stock.price}"
                         >
-                            $${stock.close.toFixed(2)}
+                            $${stock.price.toFixed(2)}
                         </h3>
 
-                        <span class="${
-                            positive ? "positive" : "negative"
-                        }">
+                        <span
+                            id="dashChange-${symbol}"
+                            class="${positive ? "positive" : "negative"}"
+                        >
 
-                            ${positive ? "+" : ""}${change}%
+                            ${positive ? "+" : ""}${stock.changePercentage.toFixed(2)}%
 
                         </span>
 
-                    </div>
+                        <div style="height: 40px; position: relative;" class="mt-2">
+                            <canvas id="sparkline-${symbol}"></canvas>
+                        </div>
+
+                    </a>
 
                 </div>
             `;
         }
+
+        await Promise.all(
+            DASHBOARD_SYMBOLS.map(symbol => {
+                const stock = quotes.find(q => q.symbol === symbol);
+                const isPositive = stock ? stock.changePercentage >= 0 : true;
+                return drawSparkline(symbol, isPositive);
+            })
+        );
+
+        startDashboardSimulation(quotes);
 
     } catch (error) {
 
@@ -169,6 +225,66 @@ async function loadMarketOverview() {
         `;
     }
 }
+
+
+function startDashboardSimulation(quotes) {
+
+    // Tracks each stock's real fetched price/trend, plus its current
+    // simulated display price. The simulation always nudges from the
+    // real base price (not the previous simulated value), so it drifts
+    // around the true price rather than wandering away from it.
+    const state = {};
+
+    DASHBOARD_SYMBOLS.forEach(symbol => {
+
+        const stock = quotes.find(q => q.symbol === symbol);
+
+        if (!stock) return;
+
+        state[symbol] = {
+            basePrice: stock.price,
+            changePercentage: stock.changePercentage
+        };
+
+    });
+
+    const walkPrices = {};
+    DASHBOARD_SYMBOLS.forEach(symbol => {
+        if (state[symbol]) walkPrices[symbol] = state[symbol].basePrice;
+    });
+
+    startPriceSimulation((randomDrift) => {
+
+        DASHBOARD_SYMBOLS.forEach(symbol => {
+
+            const info = state[symbol];
+
+            if (!info) return;
+
+            const priceEl = document.getElementById(`dashPrice-${symbol}`);
+
+            if (!priceEl) return;
+
+            let next = walkPrices[symbol] * (1 + randomDrift() / 100);
+            next += (info.basePrice - next) * 0.05;
+            walkPrices[symbol] = next;
+
+            priceEl.textContent = `$${next.toFixed(2)}`;
+            priceEl.dataset.usd = next;
+
+            priceEl.classList.add("price-pulse");
+            setTimeout(() => priceEl.classList.remove("price-pulse"), 600);
+
+            // Scroll a new point onto the sparkline so movement is visible.
+            pushSparklinePoint(symbol, next);
+
+        });
+
+    }, 2000);
+
+}
+
+
 async function loadNews() {
 
     const container = document.getElementById("newsContainer");
@@ -190,8 +306,6 @@ async function loadNews() {
         );
 
         const data = await response.json();
-
-        console.log(data);
 
         container.innerHTML = "";
 
@@ -236,56 +350,7 @@ async function loadNews() {
         `;
     }
 }
-const searchInput =
-    document.getElementById("searchInput");
 
-if (searchInput) {
-
-    searchInput.addEventListener(
-        "keypress",
-        function(e) {
-
-            if (e.key !== "Enter") return;
-
-            const query =
-                this.value.trim();
-
-            if (!query) return;
-
-            const countries = [
-                "germany",
-                "usa",
-                "united states",
-                "uk",
-                "united kingdom",
-                "france",
-                "spain",
-                "italy",
-                "canada",
-                "japan",
-                "china"
-            ];
-
-            if (
-                countries.includes(
-                    query.toLowerCase()
-                )
-            ) {
-
-                window.location.href =
-                    `stock.html?country=${encodeURIComponent(query)}`;
-
-            } else {
-
-                window.location.href =
-                    `stock.html?symbol=${encodeURIComponent(query.toUpperCase())}`;
-
-            }
-
-        }
-    );
-
-}
 const userLocation =
     document.getElementById("userLocation");
 
@@ -335,5 +400,7 @@ if (navigator.geolocation && userLocation) {
     );
 
 }
+
 loadNews();
 loadMarketOverview();
+loadDashboardChart();
